@@ -42,11 +42,11 @@ public class LibraryManager implements Manager {
     public void showMenu() {
         String menu = """
                 메뉴를 선택하세요.
-                1. 전체 도서 목록 보기
+                1. 책장 보기
                 2. 도서 추가
                 3. 도서 정보 수정
                 4. 도서 삭제
-                5. 도서 검색
+                5. 책 아이디로 도서 찾기
                 6. 종료
                 """; // Java 13부터 지원
 
@@ -55,29 +55,78 @@ public class LibraryManager implements Manager {
 
     @Override
     public void showBookshelf() {
-        System.out.println("책장");
         System.out.println("====================================");
-
-
+        bookshelf.showBookshelf();
+        System.out.println("====================================");
     }
 
     @Override
     public Book addBook() {
-        return null;
+        System.out.println("------ 도서 추가 ------");
+        scanner.nextLine();
+        System.out.print(">>> 제목: ");
+        String title = scanner.nextLine();
+        System.out.print(">>> 글쓴이: ");
+        String author = scanner.nextLine();
+        System.out.print(">>> 출판사: ");
+        String publisher = scanner.nextLine();
+        System.out.print(">>> 출판년도: ");
+        int year = scanner.nextInt();
+
+        Book book = new Book(title, author, publisher, year);
+        System.out.println(book);
+
+        book = bookshelf.addBook(book);
+        if (book != null) {
+            System.out.println("성공!");
+        } else {
+            System.out.println("실패. 책장에 책이 가득 찼습니다. 책장을 비워주세요.");
+        }
+        return book;
     }
 
     @Override
-    public Book updateBook() {
-        return null;
+    public void updateBook() {
+        System.out.println("------ 도서 정보 수정 ------");
+        System.out.println("수정할 도서의 ID를 입력하세요.");
+        System.out.print(">>> ");
+        scanner.nextLine();
+        int bookId = scanner.nextInt();
+
+        Book book = bookshelf.updateBookById(bookId);
+
+        if (book != null) {
+            System.out.println("수정된 책 정보입니다.");
+            System.out.println(book);
+        }
     }
 
     @Override
     public void removeBook() {
+        System.out.println("------ 도서 삭제 ------");
+        System.out.println("삭제할 도서의 ID를 입력하세요.");
+        System.out.print(">>> ");
+        scanner.nextLine();
+        int bookId = scanner.nextInt();
+        bookshelf.removeBookById(bookId);
 
     }
 
     @Override
-    public Book[] searchBook() {
-        return new Book[0];
+    public Book searchBook() {
+        System.out.println("------ 도서 검색 ------");
+        System.out.println("검색할 도서의 ID를 입력하세요.");
+        System.out.print(">>> ");
+        scanner.nextLine();
+        int bookId = scanner.nextInt();
+
+        Book book = bookshelf.getBookById(bookId);
+
+        if (book == null) {
+            System.out.println("해당하는 책이 책장에 없습니다.");
+            return null;
+        }
+        System.out.println(book);
+        return book;
     }
 }
