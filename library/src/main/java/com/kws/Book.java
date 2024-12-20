@@ -60,6 +60,6 @@ public class Book {
     }
 
     public String toString() {
-        return "책번호=" + bookId + ", 제목=" + title + ", 글쓴이=" + author + ", 출판사=" + publisher + ", 출판년도=" + year + "]";
+        return "책번호=" + bookId + ", 제목=" + title + ", 글쓴이=" + author + ", 출판사=" + publisher + ", 출판년도=" + year;
     }
 }
