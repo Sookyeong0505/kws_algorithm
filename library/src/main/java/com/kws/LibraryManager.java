@@ -2,10 +2,14 @@ package com.kws;
 
 import java.util.Scanner;
 
-public class LibraryManager implements Manager {
-    Bookshelf bookshelf = Bookshelf.getInstance();
+public class LibraryManager {
+    Book[][] bookshelf = Bookshelf.getInstance().getBookshelf();
     Scanner scanner = new Scanner(System.in);
     boolean continueFlag = true;
+
+    public LibraryManager() {
+        this.start();
+    }
 
     public void start() {
 
@@ -38,7 +42,6 @@ public class LibraryManager implements Manager {
         }
     }
 
-    @Override
     public void showMenu() {
         String menu = """
                 메뉴를 선택하세요.
@@ -48,20 +51,31 @@ public class LibraryManager implements Manager {
                 4. 도서 삭제
                 5. 책 아이디로 도서 찾기
                 6. 종료
-                """; // Java 13부터 지원
+                """;
 
         System.out.println(menu);
     }
 
-    @Override
     public void showBookshelf() {
         System.out.println("====================================");
-        bookshelf.showBookshelf();
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (bookshelf[i][j] != null) {
+                    System.out.print("■");
+                } else {
+                    System.out.print("□");
+                }
+
+                if (j == 9) {
+                    System.out.println();
+                }
+            }
+        }
         System.out.println("====================================");
     }
 
-    @Override
-    public Book addBook() {
+    public void addBook() {
+        BOOK_STATUS status = BOOK_STATUS.BOOKSELF_IS_FULL;
         System.out.println("------ 도서 추가 ------");
         scanner.nextLine();
         System.out.print(">>> 제목: ");
@@ -76,57 +90,112 @@ public class LibraryManager implements Manager {
         Book book = new Book(title, author, publisher, year);
         System.out.println(book);
 
-        book = bookshelf.addBook(book);
-        if (book != null) {
-            System.out.println("성공!");
-        } else {
-            System.out.println("실패. 책장에 책이 가득 찼습니다. 책장을 비워주세요.");
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (bookshelf[i][j] == null) {
+                    bookshelf[i][j] = book;
+                    // i+1 줄 j+1번째 칸에 추가합니다
+                    System.out.println("책장에 책을 추가했습니다. [" + (i+1) + "줄 " + (j+1) + "번째 칸]");
+                    status = BOOK_STATUS.SUCCESS;
+                }
+            }
         }
-        return book;
+
+        printResult(status);
     }
 
-    @Override
     public void updateBook() {
+        BOOK_STATUS status = BOOK_STATUS.BOOK_NOT_FOUND;
         System.out.println("------ 도서 정보 수정 ------");
         System.out.println("수정할 도서의 ID를 입력하세요.");
         System.out.print(">>> ");
         scanner.nextLine();
         int bookId = scanner.nextInt();
-
-        Book book = bookshelf.updateBookById(bookId);
-
-        if (book != null) {
-            System.out.println("수정된 책 정보입니다.");
-            System.out.println(book);
+        Book book = null;
+        for (int i=0; i<10; i++) {
+            for (int j=0; j<10; j++) {
+                if (bookshelf[i][j] != null && bookshelf[i][j].getBookId() == bookId) {
+                    System.out.println("수정할 책을 " + (i+1) + "줄 " + (j+1) + "번째 칸에서 찾았습니다.");
+                    book = bookshelf[i][j];
+                    System.out.println(book);
+                    System.out.println("수정할 정보를 입력하세요.");
+                    System.out.print(">>> 제목: ");
+                    String title = scanner.nextLine();
+                    book.setTitle(title);
+                    System.out.print(">>> 글쓴이: ");
+                    String author = scanner.nextLine();
+                    book.setAuthor(author);
+                    System.out.print(">>> 출판사: ");
+                    String publisher = scanner.nextLine();
+                    book.setPublisher(publisher);
+                    System.out.print(">>> 출판년도: ");
+                    int year = scanner.nextInt();
+                    book.setYear(year);
+                }
+            }
         }
+
+        printResult(status);
     }
 
-    @Override
     public void removeBook() {
+        BOOK_STATUS status = BOOK_STATUS.BOOK_NOT_FOUND;
         System.out.println("------ 도서 삭제 ------");
         System.out.println("삭제할 도서의 ID를 입력하세요.");
         System.out.print(">>> ");
         scanner.nextLine();
         int bookId = scanner.nextInt();
-        bookshelf.removeBookById(bookId);
 
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (bookshelf[i][j] != null && bookshelf[i][j].getBookId() == bookId) {
+                    bookshelf[i][j] = null;
+                    System.out.println("책장에서 책을 제거했습니다.");
+                    status = BOOK_STATUS.SUCCESS;
+                }
+            }
+        }
+
+        printResult(status);
     }
 
-    @Override
-    public Book searchBook() {
+    public void searchBook() {
+        BOOK_STATUS status = BOOK_STATUS.BOOK_NOT_FOUND;
         System.out.println("------ 도서 검색 ------");
         System.out.println("검색할 도서의 ID를 입력하세요.");
         System.out.print(">>> ");
         scanner.nextLine();
         int bookId = scanner.nextInt();
-
-        Book book = bookshelf.getBookById(bookId);
-
-        if (book == null) {
-            System.out.println("해당하는 책이 책장에 없습니다.");
-            return null;
+        Book book = null;
+        for (int i=0; i<10; i++) {
+            for (int j=0; j<10; j++) {
+                if (bookshelf[i][j] != null && bookshelf[i][j].getBookId() == bookId) {
+                    book = bookshelf[i][j];
+                    System.out.println("책을 " + (i+1) + "줄 " + (j+1) + "번째 칸에서 찾았습니다.");
+                }
+            }
         }
         System.out.println(book);
-        return book;
+        printResult(status);
+    }
+
+    public void printResult(BOOK_STATUS status) {
+        switch (status) {
+            case SUCCESS:
+                System.out.println("성공!");
+                break;
+            case BOOKSELF_IS_FULL:
+                System.out.println("실패. 책장에 책이 가득 찼습니다. 책장을 비워주세요.");
+                break;
+            case BOOK_NOT_FOUND:
+                System.out.println("해당하는 책이 책장에 없습니다.");
+                break;
+            case BOOK_ALREADY_EXISTS:
+                System.out.println("해당하는 책이 이미 책장에 있습니다.");
+                break;
+            case INVALID_ID:
+                System.out.println("잘못된 ID입니다.");
+                break;
+        }
     }
 }
