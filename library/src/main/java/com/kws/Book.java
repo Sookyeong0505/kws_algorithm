@@ -1,13 +1,17 @@
 package com.kws;
 
 public class Book {
+    // 모든 인스턴스에서 공유한다.
+    private static int serialNum = 0;
     private int bookId;
     private String title;
     private String author;
     private String publisher;
     private int year;
 
-    public Book(int bookId, String title, String author, String publisher, int year) {
+    // bookId는 책이 추가될 때마다 1씩 증가
+    public Book(String title, String author, String publisher, int year) {
+        serialNum++;
         this.bookId = bookId;
         this.title = title;
         this.author = author;
