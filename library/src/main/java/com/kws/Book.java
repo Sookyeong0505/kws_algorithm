@@ -12,7 +12,7 @@ public class Book {
     // bookId는 책이 추가될 때마다 1씩 증가
     public Book(String title, String author, String publisher, int year) {
         serialNum++;
-        this.bookId = bookId;
+        this.bookId = serialNum;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
